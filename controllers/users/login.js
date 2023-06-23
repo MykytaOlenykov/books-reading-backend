@@ -27,6 +27,7 @@ const login = async (req, res) => {
     maxAge: Number(COOKIE_MAX_AGE),
     httpOnly: true,
     signed: true,
+    secure: true,
   });
 
   res.json({
