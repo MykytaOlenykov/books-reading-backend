@@ -9,7 +9,7 @@ const refresh = async (req, res) => {
   const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ");
 
-  if (bearer !== "Bearer") {
+  if (bearer !== "Bearer" || !token) {
     throw HttpError(401);
   }
 
@@ -18,7 +18,6 @@ const refresh = async (req, res) => {
   const user = await User.findById(id);
 
   if (!user || !user.refreshToken || user.refreshToken !== token) {
-    console.log("mnogo proverok");
     throw HttpError(401);
   }
 
