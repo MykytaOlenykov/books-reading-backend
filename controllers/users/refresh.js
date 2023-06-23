@@ -32,7 +32,6 @@ const refresh = async (req, res) => {
 
   res.json({
     accessToken,
-    refreshToken,
   });
 };
 

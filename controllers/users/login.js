@@ -35,7 +35,6 @@ const login = async (req, res) => {
       email: user.email,
     },
     accessToken,
-    refreshToken,
   });
 };
 
