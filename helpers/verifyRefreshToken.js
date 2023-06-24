@@ -8,7 +8,7 @@ const verifyRefreshToken = (token) => {
   try {
     const payload = jwt.verify(token, REFRESH_TOKEN_SECRET_KEY);
     return payload.id;
-  } catch (error) {
+  } catch {
     throw HttpError(401);
   }
 };
