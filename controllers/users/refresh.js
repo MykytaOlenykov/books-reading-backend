@@ -1,18 +1,19 @@
-const jwt = require("jsonwebtoken");
-
 const { User } = require("../../models/user");
-const { HttpError, createTokens } = require("../../helpers");
-
-const { REFRESH_TOKEN_SECRET_KEY, COOKIE_MAX_AGE, DOMAIN } = process.env;
+const {
+  HttpError,
+  createTokens,
+  verifyRefreshToken,
+} = require("../../helpers");
 
 const refresh = async (req, res) => {
-  const { refreshToken: token } = req.signedCookies;
+  const { authorization = "" } = req.headers;
+  const [bearer, token] = authorization.split(" ");
 
-  if (!token) {
+  if (bearer !== "Bearer") {
     throw HttpError(401);
   }
 
-  const { id } = jwt.verify(token, REFRESH_TOKEN_SECRET_KEY);
+  const id = verifyRefreshToken(token);
 
   const user = await User.findById(id);
 
@@ -24,16 +25,9 @@ const refresh = async (req, res) => {
 
   await User.findByIdAndUpdate(user._id, { accessToken, refreshToken });
 
-  res.cookie("refreshToken", refreshToken, {
-    maxAge: Number(COOKIE_MAX_AGE),
-    httpOnly: true,
-    signed: true,
-    secure: true,
-    domain: DOMAIN,
-  });
-
   res.json({
     accessToken,
+    refreshToken,
   });
 };
 
