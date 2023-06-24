@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { User } = require("../../models/user");
 const { HttpError, createTokens } = require("../../helpers");
 
-const { COOKIE_MAX_AGE } = process.env;
+const { COOKIE_MAX_AGE, DOMAIN } = process.env;
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -28,6 +28,7 @@ const login = async (req, res) => {
     httpOnly: true,
     signed: true,
     secure: true,
+    domain: DOMAIN,
   });
 
   res.json({

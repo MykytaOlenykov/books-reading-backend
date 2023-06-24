@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../../models/user");
 const { HttpError, createTokens } = require("../../helpers");
 
-const { REFRESH_TOKEN_SECRET_KEY, COOKIE_MAX_AGE } = process.env;
+const { REFRESH_TOKEN_SECRET_KEY, COOKIE_MAX_AGE, DOMAIN } = process.env;
 
 const refresh = async (req, res) => {
   const { refreshToken: token } = req.signedCookies;
@@ -29,6 +29,7 @@ const refresh = async (req, res) => {
     httpOnly: true,
     signed: true,
     secure: true,
+    domain: DOMAIN,
   });
 
   res.json({
