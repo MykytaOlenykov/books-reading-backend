@@ -28,6 +28,7 @@ const refresh = async (req, res) => {
     maxAge: Number(COOKIE_MAX_AGE),
     httpOnly: true,
     signed: true,
+    domain: ".vercel.app",
     secure: true,
   });
 
