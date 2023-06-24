@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { User } = require("../../models/user");
 const { HttpError, createTokens } = require("../../helpers");
 
-const { COOKIE_MAX_AGE, CLIENT_URL } = process.env;
+const { COOKIE_MAX_AGE } = process.env;
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -27,7 +27,6 @@ const login = async (req, res) => {
     maxAge: Number(COOKIE_MAX_AGE),
     httpOnly: true,
     signed: true,
-    domain: CLIENT_URL,
     secure: true,
   });
 
