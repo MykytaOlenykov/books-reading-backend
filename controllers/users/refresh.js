@@ -4,17 +4,10 @@ const {
   createTokens,
   verifyRefreshToken,
 } = require("../../helpers");
-
-const maxAge = Number(process.env.MAX_AGE);
+const { cookieConfig } = require("../../configs");
 
 const refresh = async (req, res) => {
   const { refreshToken: token } = req.cookies;
-  // const { authorization = "" } = req.headers;
-  // const [bearer, token] = authorization.split(" ");
-
-  // if (bearer !== "Bearer") {
-  //   throw HttpError(401);
-  // }
 
   const id = verifyRefreshToken(token);
 
@@ -28,16 +21,10 @@ const refresh = async (req, res) => {
 
   await User.findByIdAndUpdate(user._id, { accessToken, refreshToken });
 
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    sameSite: "none",
-    secure: true,
-    maxAge,
-  });
+  res.cookie("refreshToken", refreshToken, cookieConfig);
 
   res.json({
     accessToken,
-    refreshToken,
   });
 };
 
