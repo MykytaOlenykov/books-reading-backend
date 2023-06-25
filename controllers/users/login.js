@@ -21,6 +21,8 @@ const login = async (req, res) => {
 
   await User.findByIdAndUpdate(user._id, { accessToken, refreshToken });
 
+  res.cookie("refreshToken", refreshToken, { httpOnly: true });
+
   res.json({
     userData: {
       name: user.name,

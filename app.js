@@ -1,6 +1,7 @@
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const usersRouter = require("./routes/api/users");
@@ -14,7 +15,8 @@ const { CLIENT_URL } = process.env;
 
 app.use(logger(formatsLogger));
 app.use(express.json());
-app.use(cors({ origin: CLIENT_URL }));
+app.use(cors({ credentials: true, origin: CLIENT_URL }));
+app.use(cookieParser());
 
 app.use("/api/users", usersRouter);
 app.use("/api/books", booksRouter);
