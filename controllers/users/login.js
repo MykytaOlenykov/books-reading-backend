@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const { User } = require("../../models/user");
 const { HttpError, createTokens } = require("../../helpers");
 
+const maxAge = Number(process.env.MAX_AGE);
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -25,6 +27,7 @@ const login = async (req, res) => {
     httpOnly: true,
     sameSite: "none",
     secure: true,
+    maxAge,
   });
 
   res.json({
