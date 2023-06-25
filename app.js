@@ -11,12 +11,12 @@ const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
-const { CLIENT_URL } = process.env;
+const { CLIENT_URL, SECRET_COOKIE_KEY } = process.env;
 
 app.use(logger(formatsLogger));
 app.use(express.json());
 app.use(cors({ credentials: true, origin: CLIENT_URL }));
-app.use(cookieParser());
+app.use(cookieParser(SECRET_COOKIE_KEY));
 
 app.use("/api/users", usersRouter);
 app.use("/api/books", booksRouter);

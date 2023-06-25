@@ -7,7 +7,7 @@ const {
 const { cookieConfig } = require("../../configs");
 
 const refresh = async (req, res) => {
-  const { refreshToken: token } = req.cookies;
+  const { refreshToken: token } = req.signedCookies;
 
   const id = verifyRefreshToken(token);
 
