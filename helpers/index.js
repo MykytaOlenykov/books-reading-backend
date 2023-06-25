@@ -3,6 +3,7 @@ const handleMongooseError = require("./handleMongooseError");
 const HttpError = require("./HttpError");
 const createTokens = require("./createTokens");
 const verifyRefreshToken = require("./verifyRefreshToken");
+const integerValidator = require("./integerValidator");
 
 module.exports = {
   ctrlWrapper,
@@ -10,4 +11,5 @@ module.exports = {
   HttpError,
   createTokens,
   verifyRefreshToken,
+  integerValidator,
 };
