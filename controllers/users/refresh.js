@@ -6,6 +6,7 @@ const {
 } = require("../../helpers");
 
 const refresh = async (req, res) => {
+  const { refreshToken: cookie } = req.cookies;
   const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ");
 
@@ -28,6 +29,7 @@ const refresh = async (req, res) => {
   res.json({
     accessToken,
     refreshToken,
+    cookie,
   });
 };
 
