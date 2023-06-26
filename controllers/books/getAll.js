@@ -3,7 +3,7 @@ const { Book } = require("../../models/book");
 const getAll = async (req, res) => {
   const { _id: owner } = req.user;
 
-  const result = await Book.find({ owner });
+  const result = await Book.find({ owner }, "-owner -createdAt -updatedAt");
 
   const goingToRead = result.filter(({ pagesFinished }) => pagesFinished === 0);
 
