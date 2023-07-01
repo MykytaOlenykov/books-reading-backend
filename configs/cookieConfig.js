@@ -13,6 +13,7 @@ const cookieConfig = {
   signed: true,
   sameSite: "none",
   secure: true,
+  domain: process.env.COOKIE_DOMAIN,
 };
 
 module.exports = isProd ? cookieConfig : localCookieConfig;
