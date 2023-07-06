@@ -11,7 +11,7 @@ const cookieConfig = {
   httpOnly: true,
   maxAge,
   signed: true,
-  sameSite: "none",
+  sameSite: "strict",
   secure: true,
 };
 
