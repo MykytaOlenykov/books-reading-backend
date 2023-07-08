@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 
 const { User } = require("../../models/user");
 const { HttpError, createTokens } = require("../../helpers");
-const { cookieConfig } = require("../../configs");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -22,14 +21,13 @@ const login = async (req, res) => {
 
   await User.findByIdAndUpdate(user._id, { accessToken, refreshToken });
 
-  res.cookie("refreshToken", refreshToken, cookieConfig);
-
   res.json({
     userData: {
       name: user.name,
       email: user.email,
     },
     accessToken,
+    refreshToken,
   });
 };
 

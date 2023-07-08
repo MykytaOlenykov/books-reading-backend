@@ -2,6 +2,7 @@ const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
 const { handleMongooseError, integerValidator } = require("../helpers");
+const { regexps } = require("../constants");
 
 const bookSchema = new Schema(
   {
@@ -23,8 +24,7 @@ const bookSchema = new Schema(
         validator: integerValidator,
         message: "Number must be integer",
       },
-      min: 1000,
-      max: new Date().getFullYear(),
+      match: regexps.publishYear,
       required: true,
     },
     pagesTotal: {

@@ -1,30 +1,16 @@
 const { User } = require("../../models/user");
-const {
-  HttpError,
-  createTokens,
-  verifyRefreshToken,
-} = require("../../helpers");
-const { cookieConfig } = require("../../configs");
+const { createTokens } = require("../../helpers");
 
 const refresh = async (req, res) => {
-  const { refreshToken: token } = req.signedCookies;
+  const { _id } = req.user;
 
-  const id = verifyRefreshToken(token);
+  const { accessToken, refreshToken } = createTokens(_id);
 
-  const user = await User.findById(id);
-
-  if (!user || !user.refreshToken || user.refreshToken !== token) {
-    throw HttpError(401);
-  }
-
-  const { accessToken, refreshToken } = createTokens(user._id);
-
-  await User.findByIdAndUpdate(user._id, { accessToken, refreshToken });
-
-  res.cookie("refreshToken", refreshToken, cookieConfig);
+  await User.findByIdAndUpdate(_id, { accessToken, refreshToken });
 
   res.json({
     accessToken,
+    refreshToken,
   });
 };
 
