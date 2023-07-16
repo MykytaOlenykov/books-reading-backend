@@ -2,7 +2,7 @@ const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
 const { handleMongooseError, integerValidator } = require("../helpers");
-const { regexps } = require("../constants");
+const { regexps, customSchemaMessages } = require("../constants");
 
 const bookSchema = new Schema(
   {
@@ -20,18 +20,25 @@ const bookSchema = new Schema(
     },
     publishYear: {
       type: Number,
-      validate: {
-        validator: integerValidator,
-        message: "Number must be integer",
-      },
-      match: regexps.publishYear,
+      validate: [
+        {
+          validator: integerValidator,
+          message: customSchemaMessages.integer,
+        },
+        {
+          validator(value) {
+            return regexps.publishYear.test(String(value));
+          },
+          message: customSchemaMessages.publishYearMatch,
+        },
+      ],
       required: true,
     },
     pagesTotal: {
       type: Number,
       validate: {
         validator: integerValidator,
-        message: "Number must be integer",
+        message: customSchemaMessages.integer,
       },
       min: 1,
       max: 5000,
@@ -44,12 +51,11 @@ const bookSchema = new Schema(
           validator(value) {
             return value <= this.pagesTotal;
           },
-          message:
-            "The number of pagesFinished must be less than or equal to the number of pagesTotal",
+          message: customSchemaMessages.pagesFinishedMatch,
         },
         {
           validator: integerValidator,
-          message: "Number must be integer",
+          message: customSchemaMessages.integer,
         },
       ],
       min: 0,
@@ -74,9 +80,20 @@ const addSchema = Joi.object({
   publishYear: Joi.number()
     .integer()
     .min(1000)
-    .max(new Date().getFullYear())
+    .custom((value, helpers) => {
+      if (!regexps.publishYear.test(String(value))) {
+        return helpers.message(customSchemaMessages.publishYearMatch);
+      }
+      return true;
+    })
+    .options({ convert: false })
     .required(),
-  pagesTotal: Joi.number().integer().min(1).max(5000).required(),
+  pagesTotal: Joi.number()
+    .integer()
+    .min(1)
+    .max(5000)
+    .options({ convert: false })
+    .required(),
 });
 
 const schemas = {
