@@ -29,7 +29,7 @@ const bookSchema = new Schema(
           validator(value) {
             return regexps.publishYear.test(String(value));
           },
-          message: customSchemaMessages.publishYearMatch,
+          message: "Invalid 'publishYear'. Please, use real date.",
         },
       ],
       required: true,
@@ -51,7 +51,8 @@ const bookSchema = new Schema(
           validator(value) {
             return value <= this.pagesTotal;
           },
-          message: customSchemaMessages.pagesFinishedMatch,
+          message:
+            "The number of pagesFinished must be less than or equal to the number of pagesTotal",
         },
         {
           validator: integerValidator,
@@ -82,7 +83,7 @@ const addSchema = Joi.object({
     .min(1000)
     .custom((value, helpers) => {
       if (!regexps.publishYear.test(String(value))) {
-        return helpers.message(customSchemaMessages.publishYearMatch);
+        return helpers.message("Invalid 'publishYear'. Please, use real date.");
       }
       return true;
     })
