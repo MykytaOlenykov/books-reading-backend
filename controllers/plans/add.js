@@ -1,72 +1,94 @@
 const { DateTime } = require("luxon");
 
-const { Plan } = require("../../models/plan");
+const { HttpError } = require("../../helpers");
 const { Book } = require("../../models/book");
+const { Plan } = require("../../models/plan");
 
 const add = async (req, res) => {
-  const { startDate, endDate, timezone } = req.body;
+  const { startDate, endDate, books: booksIds, timezone } = req.body;
+  const { _id: owner } = req.user;
 
-  console.log(startDate, endDate);
+  const plan = await Plan.findOne({ owner });
 
-  res.json({
-    message: "ok",
+  if (plan) {
+    throw HttpError(409, "This user has a plan created.");
+  }
+
+  const startDateArr = startDate.split("-");
+  const endDateArr = endDate.split("-");
+
+  const currentDateObj = DateTime.local()
+    .setZone(timezone)
+    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+
+  const startDateObj = DateTime.local(
+    Number(startDateArr[0]),
+    Number(startDateArr[1]),
+    Number(startDateArr[2])
+  );
+
+  const durationWithCurrentDate = startDateObj
+    .setZone(timezone)
+    .diff(currentDateObj, "days")
+    .toObject().days;
+
+  if (durationWithCurrentDate === undefined || durationWithCurrentDate < 0) {
+    throw HttpError(400, "Invalid dates");
+  }
+
+  const endDateObj = DateTime.local(
+    Number(endDateArr[0]),
+    Number(endDateArr[1]),
+    Number(endDateArr[2])
+  );
+
+  const duration = endDateObj.diff(startDateObj, "days").toObject().days;
+
+  if (!duration || duration < 1) {
+    throw HttpError(400, "Invalid dates");
+  }
+
+  let totalPages = 0;
+
+  const books = await Book.find({ _id: { $in: [...booksIds] } });
+
+  if (books.length !== booksIds.length) {
+    throw HttpError(400, "Invalid 'bookId'");
+  }
+
+  books.forEach((book) => {
+    if (book.pagesTotal === book.pagesFinished) {
+      throw HttpError(
+        400,
+        "Invalid 'bookId', you can't add books that you've already read"
+      );
+    }
+
+    totalPages += book.pagesTotal;
+  });
+
+  const pagesPerDay = Math.ceil(totalPages / duration);
+
+  await Plan.create({
+    startDate,
+    endDate,
+    books,
+    owner,
+  });
+
+  const newPlan = await Plan.findOne(
+    { owner },
+    "-createdAt -updatedAt"
+  ).populate("books", "-createdAt -updatedAt -owner");
+
+  return res.status(201).send({
+    _id: newPlan._id,
+    startDate: newPlan.startDate,
+    endDate: newPlan.endDate,
+    books: newPlan.books,
+    duration,
+    pagesPerDay,
   });
 };
 
 module.exports = add;
-
-// const start = async (req, res) => {
-//   const { startDate, endDate, books } = req.body;
-//   const user = req.user;
-//   const startDateArr = startDate.split("-");
-//   const endDateArr = endDate.split("-");
-//   const startDateObj = DateTime.local(
-//     Number(startDateArr[0]),
-//     Number(startDateArr[1]),
-//     Number(startDateArr[2])
-//   );
-//   const endDateObj = DateTime.local(
-//     Number(endDateArr[0]),
-//     Number(endDateArr[1]),
-//     Number(endDateArr[2])
-//   );
-//   const duration = endDateObj.diff(startDateObj, "days").toObject().days;
-//   if (!duration || duration < 1) {
-//     return res.status(400).send({ message: "Invalid dates" });
-//   }
-//   let totalPages = 0;
-//   const booksPopulated = [];
-//   for (let i = 0; i < books.length; i++) {
-//     const book = await Book.findOne({ _id: books[i] });
-//     if (!book || !user?.books.includes(book?._id)) {
-//       return res.status(400).send({ message: "Invalid 'bookId'" });
-//     }
-//     if (book.pagesFinished !== 0) {
-//       return res.status(400).send({
-//         message:
-//           "Invalid 'bookId', you can't add books that you've already read/reading",
-//       });
-//     }
-//     totalPages += book.pagesTotal;
-//     booksPopulated.push(book);
-//   }
-//   const pagesPerDay = Math.ceil(totalPages / duration);
-//   const newPlanning = await Planning.create({
-//     startDate,
-//     endDate,
-//     books,
-//     duration,
-//     pagesPerDay,
-//   });
-//   user.planning = newPlanning._id;
-//   await user.save();
-//   return res.status(201).send({
-//     startDate: newPlanning.startDate,
-//     endDate: newPlanning.endDate,
-//     books: booksPopulated,
-//     duration: newPlanning.duration,
-//     pagesPerDay: newPlanning.pagesPerDay,
-//     stats: newPlanning.stats,
-//     _id: newPlanning._id,
-//   });
-// };

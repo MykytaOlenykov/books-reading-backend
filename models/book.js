@@ -85,7 +85,7 @@ const addSchema = Joi.object({
       if (!regexps.publishYear.test(String(value))) {
         return helpers.message("Invalid 'publishYear'. Please, use real date.");
       }
-      return true;
+      return value;
     })
     .options({ convert: false })
     .required(),

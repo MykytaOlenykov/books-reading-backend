@@ -1,13 +1,14 @@
 const { Router } = require("express");
 
-const { authenticate } = require("../../middlewares");
+const { authenticate, validateBody } = require("../../middlewares");
+const { schemas } = require("../../models/plan");
 const ctrl = require("../../controllers/plans");
 
 const router = Router();
 
 // router.get("");
 
-router.post("/", authenticate, ctrl.add);
+router.post("/", authenticate, validateBody(schemas.addPlanSchema), ctrl.add);
 
 // router.patch("");
 
