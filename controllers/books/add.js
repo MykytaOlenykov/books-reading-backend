@@ -3,9 +3,9 @@ const { HttpError } = require("../../helpers");
 
 const add = async (req, res) => {
   const { _id: owner } = req.user;
-  const { title, publishYear } = req.body;
+  const { title, author } = req.body;
 
-  const book = await Book.findOne({ owner, title, publishYear });
+  const book = await Book.findOne({ owner, title, author });
 
   if (book) {
     throw HttpError(409, "This user already has such a book");
