@@ -23,10 +23,10 @@ const planSchema = new Schema(
       validate: [
         {
           validator(value) {
-            return !(value.length < 1 || value.length > 10);
+            return !(value.length < 1 || value.length > 20);
           },
           message:
-            "The length of the books array must be at least 1 and not more than 10",
+            "The length of the books array must be at least 1 and not more than 20",
         },
         {
           validator(value) {
@@ -86,7 +86,7 @@ const addPlanSchema = Joi.object({
       return value;
     })
     .min(1)
-    .max(10)
+    .max(20)
     .required(),
 });
 
