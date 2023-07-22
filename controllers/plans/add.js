@@ -48,15 +48,13 @@ const add = async (req, res) => {
     throw HttpError(400, "Invalid dates");
   }
 
-  let totalPages = 0;
-
   const books = await Book.find({ _id: { $in: [...booksIds] } });
 
   if (books.length !== booksIds.length) {
     throw HttpError(400, "Invalid 'bookId'");
   }
 
-  books.forEach((book) => {
+  const totalPages = books.reduce((acc, book) => {
     if (book.pagesTotal === book.pagesFinished) {
       throw HttpError(
         400,
@@ -64,8 +62,8 @@ const add = async (req, res) => {
       );
     }
 
-    totalPages += book.pagesTotal;
-  });
+    return acc + book.pagesTotal - book.pagesFinished;
+  }, 0);
 
   const pagesPerDay = Math.ceil(totalPages / duration);
 
@@ -81,7 +79,6 @@ const add = async (req, res) => {
     startDate: newPlan.startDate,
     endDate: newPlan.endDate,
     books: newPlan.books,
-    duration,
     pagesPerDay,
   });
 };

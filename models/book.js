@@ -71,6 +71,8 @@ const bookSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
+bookSchema.index({ owner: 1, title: 1, author: 1 }, { unique: true });
+
 bookSchema.post("save", handleMongooseError);
 
 const Book = model("book", bookSchema);

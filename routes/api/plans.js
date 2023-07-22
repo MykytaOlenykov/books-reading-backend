@@ -6,7 +6,7 @@ const ctrl = require("../../controllers/plans");
 
 const router = Router();
 
-// router.get("");
+router.get("/", authenticate, ctrl.get);
 
 router.post("/", authenticate, validateBody(schemas.addPlanSchema), ctrl.add);
 
