@@ -67,12 +67,17 @@ const add = async (req, res) => {
 
   const pagesPerDay = Math.ceil(totalPages / duration);
 
-  const newPlan = await Plan.create({
+  await Plan.create({
     startDate,
     endDate,
     books,
     owner,
   });
+
+  const newPlan = await Plan.findOne({ owner }).populate(
+    "books",
+    "-createdAt -updatedAt -owner"
+  );
 
   return res.status(201).send({
     _id: newPlan._id,
