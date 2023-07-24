@@ -1,6 +1,5 @@
 const { Schema, model, isValidObjectId } = require("mongoose");
 const Joi = require("joi");
-const { DateTime } = require("luxon");
 
 const { handleMongooseError } = require("../helpers");
 const { regexps } = require("../constants");
@@ -42,6 +41,15 @@ const planSchema = new Schema(
       ],
       required: true,
     },
+    stats: {
+      type: [Schema.Types.ObjectId],
+      ref: "stat",
+      default: null,
+    },
+    isFinished: {
+      type: Boolean,
+      default: false,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -59,14 +67,6 @@ const Plan = model("plan", planSchema);
 const addPlanSchema = Joi.object({
   startDate: Joi.string().pattern(regexps.date).required(),
   endDate: Joi.string().pattern(regexps.date).required(),
-  timezone: Joi.string()
-    .custom((value, helpers) => {
-      if (!DateTime.local().setZone(value).isValid) {
-        return helpers.message("Invalid timezone");
-      }
-      return value;
-    })
-    .required(),
   books: Joi.array()
     .items(
       Joi.custom((value, helpers) => {

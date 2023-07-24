@@ -12,6 +12,4 @@ router.post("/", authenticate, validateBody(schemas.addPlanSchema), ctrl.add);
 
 router.delete("/", authenticate, ctrl.finish);
 
-// router.patch("");
-
 module.exports = router;

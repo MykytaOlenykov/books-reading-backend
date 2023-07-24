@@ -1,12 +1,15 @@
 const { DateTime } = require("luxon");
 
-const { HttpError } = require("../../helpers");
+const { HttpError, createDateObj, validateTimezone } = require("../../helpers");
 const { Book } = require("../../models/book");
 const { Plan } = require("../../models/plan");
 
 const add = async (req, res) => {
-  const { startDate, endDate, books: booksIds, timezone } = req.body;
+  const { startDate, endDate, books: booksIds } = req.body;
   const { _id: owner } = req.user;
+  const { timezone } = req.query;
+
+  validateTimezone(timezone);
 
   const plan = await Plan.findOne({ owner });
 
@@ -14,41 +17,31 @@ const add = async (req, res) => {
     throw HttpError(409, "This user has a plan created.");
   }
 
-  const startDateArr = startDate.split("-");
-  const endDateArr = endDate.split("-");
-
   const currentDateObj = DateTime.local()
     .setZone(timezone)
     .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 
-  const startDateObj = DateTime.local(
-    Number(startDateArr[0]),
-    Number(startDateArr[1]),
-    Number(startDateArr[2])
-  );
+  const startDateObj = createDateObj(startDate);
+
+  const endDateObj = createDateObj(endDate);
 
   const durationWithCurrentDate = startDateObj
     .setZone(timezone)
     .diff(currentDateObj, "days")
     .toObject().days;
 
-  if (durationWithCurrentDate === undefined || durationWithCurrentDate < 0) {
-    throw HttpError(400, "Invalid dates");
-  }
-
-  const endDateObj = DateTime.local(
-    Number(endDateArr[0]),
-    Number(endDateArr[1]),
-    Number(endDateArr[2])
-  );
-
   const duration = endDateObj.diff(startDateObj, "days").toObject().days;
 
-  if (!duration || duration < 1) {
+  if (
+    durationWithCurrentDate === undefined ||
+    durationWithCurrentDate < 0 ||
+    !duration ||
+    duration < 1
+  ) {
     throw HttpError(400, "Invalid dates");
   }
 
-  const books = await Book.find({ _id: { $in: [...booksIds] } });
+  const books = await Book.find({ _id: { $in: [...booksIds] }, owner });
 
   if (books.length !== booksIds.length) {
     throw HttpError(400, "Invalid 'bookId'");
@@ -84,6 +77,7 @@ const add = async (req, res) => {
     startDate: newPlan.startDate,
     endDate: newPlan.endDate,
     books: newPlan.books,
+    status: newPlan.status,
     pagesPerDay,
   });
 };

@@ -12,10 +12,10 @@ router.post("/", authenticate, validateBody(schemas.addSchema), ctrl.add);
 
 router.delete("/:bookId", authenticate, isValidId, ctrl.deleteById);
 
-router.patch("/review/:bookId", (_, res) => {
-  res.status(500).json({
-    message: "This route has not yet been implemented",
-  });
-});
+// router.patch("/review/:bookId", (_, res) => {
+//   res.status(500).json({
+//     message: "This route has not yet been implemented",
+//   });
+// });
 
 module.exports = router;

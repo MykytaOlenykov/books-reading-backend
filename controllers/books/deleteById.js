@@ -12,7 +12,7 @@ const deleteById = async (req, res) => {
     throw HttpError(400, "This book is included in the plan");
   }
 
-  const result = await Book.findByIdAndRemove(bookId);
+  const result = await Book.findOneAndRemove({ _id: bookId, owner });
 
   if (!result) {
     throw HttpError(404);
