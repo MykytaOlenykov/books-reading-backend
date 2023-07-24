@@ -9,16 +9,25 @@ const currentDateStatsSchema = new Schema({
     type: Number,
     required: true,
   },
-  timeOfCreation: {
+  time: {
     type: String,
     match: regexps.time,
     required: true,
+  },
+  book: {
+    type: Schema.Types.ObjectId,
+    ref: "book",
+    required: true,
+  },
+  isFinishedBook: {
+    type: Boolean,
+    default: false,
   },
 });
 
 const statSchema = new Schema(
   {
-    dateOfCreation: {
+    date: {
       type: String,
       match: regexps.date,
       required: true,
@@ -37,6 +46,11 @@ const statSchema = new Schema(
       },
       required: true,
     },
+    plan: {
+      type: Schema.Types.ObjectId,
+      ref: "plan",
+      required: true,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -46,15 +60,15 @@ const statSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
-statSchema.index({ owner: 1, dateOfCreation: 1 }, { unique: true });
+statSchema.index({ owner: 1, date: 1, plan: 1 }, { unique: true });
 
 statSchema.post("save", handleMongooseError);
 
 const Stat = model("stat", statSchema);
 
 const addStatsSchema = Joi.object({
-  dateOfCreation: Joi.string().pattern(regexps.date).required(),
-  timeOfCreation: Joi.string().pattern(regexps.time).required(),
+  date: Joi.string().pattern(regexps.date).required(),
+  time: Joi.string().pattern(regexps.time).required(),
   pagesRead: Joi.number().required(),
   book: Joi.string()
     .custom((value, helpers) => {

@@ -5,7 +5,7 @@ const getAll = async (req, res) => {
 
   const plan = await Plan.findOne({ owner }).populate(
     "stats",
-    "-createdAt -updatedAt -owner"
+    "-createdAt -updatedAt -owner -plan"
   );
 
   res.json(plan.stats);
