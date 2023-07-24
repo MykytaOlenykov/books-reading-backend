@@ -1,13 +1,15 @@
 const { DateTime } = require("luxon");
 
 const { HttpError } = require("../../helpers");
-const { Book } = require("../../models/book");
 const { Plan } = require("../../models/plan");
 
 const get = async (req, res) => {
   const { _id: owner } = req.user;
 
-  const result = await Plan.findOne({ owner }, "-owner -createdAt -updatedAt");
+  const result = await Plan.findOne({ owner }).populate(
+    "books",
+    "-createdAt -updatedAt -owner"
+  );
 
   if (!result) {
     throw HttpError(404);
@@ -30,9 +32,7 @@ const get = async (req, res) => {
 
   const duration = endDateObj.diff(currentDateObj, "days").toObject().days;
 
-  const books = await Book.find({ _id: { $in: [...result.books] } });
-
-  const totalPages = books.reduce(
+  const totalPages = result.books.reduce(
     (acc, book) => acc + book.pagesTotal - book.pagesFinished,
     0
   );
