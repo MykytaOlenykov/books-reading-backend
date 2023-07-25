@@ -68,7 +68,7 @@ const add = async (req, res) => {
   });
 
   const newPlan = await Plan.findOne({ owner }).populate(
-    "books",
+    "books stats",
     "-createdAt -updatedAt -owner"
   );
 
@@ -77,7 +77,8 @@ const add = async (req, res) => {
     startDate: newPlan.startDate,
     endDate: newPlan.endDate,
     books: newPlan.books,
-    status: newPlan.status,
+    stats: newPlan.stats,
+    isFinished: newPlan.isFinished,
     pagesPerDay,
   });
 };

@@ -10,7 +10,7 @@ const get = async (req, res) => {
   validateTimezone(timezone);
 
   const plan = await Plan.findOne({ owner }).populate(
-    "books",
+    "books stats",
     "-createdAt -updatedAt -owner"
   );
 
@@ -24,6 +24,7 @@ const get = async (req, res) => {
       startDate: plan.startDate,
       endDate: plan.endDate,
       books: plan.books,
+      stats: plan.stats,
       isFinished: plan.isFinished,
       pagesPerDay: 0,
     });
@@ -52,6 +53,7 @@ const get = async (req, res) => {
       startDate: result.startDate,
       endDate: result.endDate,
       books: result.books,
+      stats: plan.stats,
       isFinished: result.isFinished,
       pagesPerDay: 0,
     });
@@ -69,6 +71,7 @@ const get = async (req, res) => {
     startDate: plan.startDate,
     endDate: plan.endDate,
     books: plan.books,
+    stats: plan.stats,
     isFinished: plan.isFinished,
     pagesPerDay,
   });

@@ -44,7 +44,7 @@ const planSchema = new Schema(
     stats: {
       type: [Schema.Types.ObjectId],
       ref: "stat",
-      default: null,
+      default: [],
     },
     isFinished: {
       type: Boolean,
