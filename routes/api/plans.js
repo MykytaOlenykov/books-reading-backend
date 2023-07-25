@@ -11,6 +11,13 @@ router.get("/", authenticate, ctrl.get);
 
 router.post("/", authenticate, validateBody(schemas.addPlanSchema), ctrl.add);
 
+router.patch(
+  "/",
+  authenticate,
+  validateBody(schemas.changePlanStatusSchema),
+  ctrl.changeStatus
+);
+
 router.delete("/", authenticate, ctrl.finish);
 
 router.patch(

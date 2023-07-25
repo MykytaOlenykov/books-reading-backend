@@ -91,8 +91,13 @@ const addPlanSchema = Joi.object({
     .required(),
 });
 
+const changePlanStatusSchema = Joi.object({
+  status: Joi.string().valid("active", "timeover").required(),
+});
+
 const schemas = {
   addPlanSchema,
+  changePlanStatusSchema,
 };
 
 module.exports = {
