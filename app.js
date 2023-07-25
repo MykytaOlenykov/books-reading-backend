@@ -6,7 +6,6 @@ require("dotenv").config();
 const usersRouter = require("./routes/api/users");
 const booksRouter = require("./routes/api/books");
 const plansRouter = require("./routes/api/plans");
-const statsRouter = require("./routes/api/stats");
 
 const app = express();
 
@@ -21,7 +20,6 @@ app.use(cors({ origin: CLIENT_URL }));
 app.use("/api/users", usersRouter);
 app.use("/api/books", booksRouter);
 app.use("/api/plans", plansRouter);
-app.use("/api/stats", statsRouter);
 
 app.use((_, res) => {
   res.status(404).json({ message: "Not found" });

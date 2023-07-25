@@ -21,6 +21,10 @@ const add = async (req, res) => {
     throw HttpError(404);
   }
 
+  if (plan.status === "finished" || plan.status === "timeover") {
+    throw HttpError(400, "plan is finished");
+  }
+
   const startDateObj = createDateObj(plan.startDate);
 
   const endDateObj = createDateObj(plan.endDate);
@@ -41,6 +45,14 @@ const add = async (req, res) => {
     .setZone(timezone)
     .diff(currentDateObj, "days")
     .toObject().days;
+
+  const isTimeover = endDateObj.diff(startDateObj, "days").toObject().days <= 0;
+
+  if (isTimeover) {
+    await Plan.findByIdAndUpdate(plan._id, { status: "timeover" });
+
+    throw HttpError(409, "timeover");
+  }
 
   if (
     durationWithStartDate === undefined ||
@@ -80,6 +92,21 @@ const add = async (req, res) => {
 
   const isFinishedBook = updatedBook.pagesTotal === updatedBook.pagesFinished;
 
+  const { books } = await Plan.findOne({ owner }).populate(
+    "books",
+    "-createdAt -updatedAt -owner"
+  );
+
+  const isFinishedPlan =
+    books.reduce(
+      (acc, book) => acc + book.pagesTotal - book.pagesFinished,
+      0
+    ) === 0;
+
+  if (isFinishedPlan) {
+    await Plan.findByIdAndUpdate(plan._id, { status: "finished" });
+  }
+
   const bookObj = {
     _id: updatedBook._id,
     title: updatedBook.title,
@@ -88,6 +115,8 @@ const add = async (req, res) => {
     pagesTotal: updatedBook.pagesTotal,
     pagesFinished: updatedBook.pagesFinished,
   };
+
+  const { status } = await Plan.findById(plan._id);
 
   if (plan.stats.length) {
     const stats = await Stat.findOneAndUpdate(
@@ -109,6 +138,7 @@ const add = async (req, res) => {
           currentDateStats: stats.currentDateStats,
         },
         book: bookObj,
+        planStatus: status,
       });
     }
 
@@ -134,6 +164,7 @@ const add = async (req, res) => {
         currentDateStats: newStats.currentDateStats,
       },
       book: bookObj,
+      planStatus: status,
     });
   }
 
@@ -159,6 +190,7 @@ const add = async (req, res) => {
       currentDateStats: newStats.currentDateStats,
     },
     book: bookObj,
+    planStatus: status,
   });
 };
 

@@ -18,14 +18,14 @@ const get = async (req, res) => {
     throw HttpError(404);
   }
 
-  if (plan.isFinished) {
+  if (plan.status === "finished" || plan.status === "timeover") {
     return res.json({
       _id: plan._id,
       startDate: plan.startDate,
       endDate: plan.endDate,
       books: plan.books,
       stats: plan.stats,
-      isFinished: plan.isFinished,
+      status: plan.status,
       pagesPerDay: 0,
     });
   }
@@ -44,17 +44,17 @@ const get = async (req, res) => {
   if (!duration || duration <= 0) {
     const result = await Plan.findByIdAndUpdate(
       plan._id,
-      { isFinished: true },
+      { status: "timeover" },
       { new: true }
-    );
+    ).populate("books stats", "-createdAt -updatedAt -owner");
 
     return res.json({
       _id: result._id,
       startDate: result.startDate,
       endDate: result.endDate,
       books: result.books,
-      stats: plan.stats,
-      isFinished: result.isFinished,
+      stats: result.stats,
+      status: result.status,
       pagesPerDay: 0,
     });
   }
@@ -72,7 +72,7 @@ const get = async (req, res) => {
     endDate: plan.endDate,
     books: plan.books,
     stats: plan.stats,
-    isFinished: plan.isFinished,
+    status: plan.status,
     pagesPerDay,
   });
 };

@@ -46,9 +46,10 @@ const planSchema = new Schema(
       ref: "stat",
       default: [],
     },
-    isFinished: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: ["idle", "active", "finished", "timeover"],
+      default: "idle",
     },
     owner: {
       type: Schema.Types.ObjectId,
