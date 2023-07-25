@@ -46,11 +46,6 @@ const statSchema = new Schema(
       },
       required: true,
     },
-    plan: {
-      type: Schema.Types.ObjectId,
-      ref: "plan",
-      required: true,
-    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -59,8 +54,6 @@ const statSchema = new Schema(
   },
   { versionKey: false, timestamps: true }
 );
-
-statSchema.index({ owner: 1, date: 1, plan: 1 }, { unique: true });
 
 statSchema.post("save", handleMongooseError);
 

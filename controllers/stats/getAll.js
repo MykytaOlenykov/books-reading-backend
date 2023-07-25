@@ -1,4 +1,5 @@
 const { Plan } = require("../../models/plan");
+const { HttpError } = require("../../helpers");
 
 const getAll = async (req, res) => {
   const { _id: owner } = req.user;
@@ -7,6 +8,10 @@ const getAll = async (req, res) => {
     "stats",
     "-createdAt -updatedAt -owner -plan"
   );
+
+  if (!plan) {
+    throw HttpError(404);
+  }
 
   res.json(plan.stats);
 };

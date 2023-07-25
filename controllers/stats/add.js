@@ -89,9 +89,9 @@ const add = async (req, res) => {
     pagesFinished: updatedBook.pagesFinished,
   };
 
-  if (plan.stats) {
+  if (plan.stats.length) {
     const stats = await Stat.findOneAndUpdate(
-      { owner, date, plan: plan._id },
+      { owner, date, _id: { $in: [...plan.stats] } },
       {
         $push: {
           currentDateStats: { pagesRead, time, book: bookId, isFinishedBook },
@@ -121,7 +121,6 @@ const add = async (req, res) => {
         book: bookId,
         isFinishedBook,
       },
-      plan: plan._id,
       owner,
     });
 
@@ -147,7 +146,6 @@ const add = async (req, res) => {
       book: bookId,
       isFinishedBook,
     },
-    plan: plan._id,
     owner,
   });
 
