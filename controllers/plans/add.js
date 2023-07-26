@@ -1,11 +1,7 @@
 const { differenceInDays } = require("date-fns");
 const { zonedTimeToUtc } = require("date-fns-tz");
 
-const {
-  HttpError,
-  validateTimezone,
-  calcDifferenceInDays,
-} = require("../../helpers");
+const { HttpError, validateTimezone } = require("../../helpers");
 const { Book } = require("../../models/book");
 const { Plan } = require("../../models/plan");
 
@@ -22,30 +18,22 @@ const add = async (req, res) => {
     throw HttpError(409, "This user has a plan created.");
   }
 
-  // const differenceWithCurrentDate = calcDifferenceInDays(
-  //   new Date(),
-  //   new Date(`${startDate}T00:00:00`),
-  //   timezone
-  // );
-
   const currentDateUtc = zonedTimeToUtc(new Date(), timezone);
-  const startDateUtc = zonedTimeToUtc(`${startDate}T00:00:00`, timezone);
+  const startDateUtc = zonedTimeToUtc(new Date(startDate), timezone);
+  const endDateUtc = zonedTimeToUtc(new Date(endDate), timezone);
 
   console.log("currentDateUtc", currentDateUtc);
   console.log("startDateUtc", startDateUtc);
+  console.log("endDateUtc", endDateUtc);
 
   const differenceWithCurrentDate = differenceInDays(
     startDateUtc,
     currentDateUtc
   );
 
-  console.log("differenceWithCurrentDate", differenceWithCurrentDate);
+  const difference = differenceInDays(endDateUtc, startDateUtc);
 
-  const difference = calcDifferenceInDays(
-    new Date(`${startDate}T00:00:00`),
-    new Date(`${endDate}T00:00:00`),
-    timezone
-  );
+  console.log("differenceWithCurrentDate", differenceWithCurrentDate);
 
   console.log("difference", difference);
 

@@ -5,7 +5,6 @@ const createTokens = require("./createTokens");
 const integerValidator = require("./integerValidator");
 const createDateObj = require("./createDateObj");
 const validateTimezone = require("./validateTimezone");
-const calcDifferenceInDays = require("./calcDifferenceInDays");
 
 module.exports = {
   ctrlWrapper,
@@ -15,5 +14,4 @@ module.exports = {
   integerValidator,
   createDateObj,
   validateTimezone,
-  calcDifferenceInDays,
 };
