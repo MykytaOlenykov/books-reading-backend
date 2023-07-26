@@ -38,6 +38,11 @@ const add = async (req, res) => {
     new Date(date)
   );
 
+  const difference = differenceInCalendarDays(currentDate, new Date(date));
+
+  console.log(currentDate);
+  console.log(new Date(date));
+
   const isTimeover =
     differenceInCalendarDays(new Date(plan.endDate), currentDate) <= 0;
 
@@ -47,7 +52,11 @@ const add = async (req, res) => {
     throw HttpError(409, "timeover");
   }
 
-  if (differenceWithStartDate < 0 || differenceWithEndDate < 1) {
+  if (
+    differenceWithStartDate < 0 ||
+    differenceWithEndDate < 1 ||
+    difference !== 0
+  ) {
     throw HttpError(400, "Invalid dates");
   }
 
@@ -113,31 +122,6 @@ const add = async (req, res) => {
         planStatus: status,
       });
     }
-
-    const newStats = await Stat.create({
-      date,
-      pagesPerDay,
-      currentDateStats: {
-        pagesRead,
-        time,
-        book: bookId,
-        isFinishedBook,
-      },
-      owner,
-    });
-
-    await Plan.findByIdAndUpdate(plan._id, { $push: { stats: newStats._id } });
-
-    return res.json({
-      stats: {
-        _id: newStats._id,
-        date: newStats.date,
-        pagesPerDay: newStats.pagesPerDay,
-        currentDateStats: newStats.currentDateStats,
-      },
-      book: updatedBook,
-      planStatus: status,
-    });
   }
 
   const newStats = await Stat.create({
@@ -152,7 +136,7 @@ const add = async (req, res) => {
     owner,
   });
 
-  await Plan.findByIdAndUpdate(plan._id, { stats: newStats._id });
+  await Plan.findByIdAndUpdate(plan._id, { $push: { stats: newStats._id } });
 
   res.json({
     stats: {
