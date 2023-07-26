@@ -1,9 +1,9 @@
-const { DateTime } = require("luxon");
-
 const HttpError = require("./HttpError");
 
 const validateTimezone = (timezone) => {
-  if (!timezone || !DateTime.local().setZone(timezone).isValid) {
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: timezone });
+  } catch {
     throw HttpError(400, "Invalid timezone");
   }
 };

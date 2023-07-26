@@ -1,6 +1,8 @@
-const { DateTime } = require("luxon");
-
-const { HttpError, createDateObj, validateTimezone } = require("../../helpers");
+const {
+  HttpError,
+  validateTimezone,
+  calcDifferenceInDays,
+} = require("../../helpers");
 const { Book } = require("../../models/book");
 const { Plan } = require("../../models/plan");
 
@@ -17,37 +19,59 @@ const add = async (req, res) => {
     throw HttpError(409, "This user has a plan created.");
   }
 
-  const currentDateObj = DateTime.local()
-    .setZone(timezone)
-    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+  const differenceWithCurrentDate = calcDifferenceInDays(
+    new Date(),
+    new Date(`${startDate}T00:00:00`),
+    timezone
+  );
 
-  const startDateObj = createDateObj(startDate);
+  console.log("differenceWithCurrentDate", differenceWithCurrentDate);
 
-  const endDateObj = createDateObj(endDate);
+  const difference = calcDifferenceInDays(
+    new Date(`${startDate}T00:00:00`),
+    new Date(`${endDate}T00:00:00`),
+    timezone
+  );
 
-  const durationWithCurrentDate = startDateObj
-    .setZone(timezone)
-    .diff(currentDateObj, "days")
-    .toObject().days;
+  console.log("difference", difference);
 
-  console.log("durationWithCurrentDate", durationWithCurrentDate);
+  const planStatus = differenceWithCurrentDate <= 0 ? "active" : "idle";
 
-  console.log("currentDateObj\n", currentDateObj);
-
-  console.log("startDateObj\n", startDateObj.setZone(timezone));
-
-  const duration = endDateObj.diff(startDateObj, "days").toObject().days;
-
-  const planStatus = durationWithCurrentDate <= 0 ? "active" : "idle";
-
-  if (
-    durationWithCurrentDate === undefined ||
-    durationWithCurrentDate < 0 ||
-    !duration ||
-    duration < 1
-  ) {
+  if (differenceWithCurrentDate < 0 || difference < 1) {
     throw HttpError(400, "Invalid dates");
   }
+
+  // const currentDateObj = DateTime.local()
+  //   .setZone(timezone)
+  //   .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+
+  // const startDateObj = createDateObj(startDate);
+
+  // const endDateObj = createDateObj(endDate);
+
+  // const durationWithCurrentDate = startDateObj
+  //   .setZone(timezone)
+  //   .diff(currentDateObj, "days")
+  //   .toObject().days;
+
+  // console.log("durationWithCurrentDate", durationWithCurrentDate);
+
+  // console.log("currentDateObj\n", currentDateObj);
+
+  // console.log("startDateObj\n", startDateObj.setZone(timezone));
+
+  // const duration = endDateObj.diff(startDateObj, "days").toObject().days;
+
+  // const planStatus = durationWithCurrentDate <= 0 ? "active" : "idle";
+
+  // if (
+  //   durationWithCurrentDate === undefined ||
+  //   durationWithCurrentDate < 0 ||
+  //   !duration ||
+  //   duration < 1
+  // ) {
+  //   throw HttpError(400, "Invalid dates");
+  // }
 
   const books = await Book.find({ _id: { $in: [...booksIds] }, owner });
 
@@ -66,7 +90,7 @@ const add = async (req, res) => {
     return acc + book.pagesTotal - book.pagesFinished;
   }, 0);
 
-  const pagesPerDay = Math.ceil(totalPages / duration);
+  const pagesPerDay = Math.ceil(totalPages / difference);
 
   await Plan.create({
     startDate,
