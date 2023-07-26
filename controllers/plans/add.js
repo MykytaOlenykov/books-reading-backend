@@ -24,7 +24,7 @@ const add = async (req, res) => {
 
   const serverTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const serverDateUtc = utcToZonedTime(localDate, serverTimezone);
+  const serverDateUtc = utcToZonedTime(new Date(), serverTimezone);
 
   const currentDateUtc = utcToZonedTime(serverDateUtc, timezone);
 
