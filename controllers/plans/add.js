@@ -32,7 +32,7 @@ const add = async (req, res) => {
 
   const duration = endDateObj.diff(startDateObj, "days").toObject().days;
 
-  const planStatus = durationWithCurrentDate === 0 ? "active" : "idle";
+  const planStatus = durationWithCurrentDate <= 0 ? "active" : "idle";
 
   if (
     durationWithCurrentDate === undefined ||
@@ -70,7 +70,7 @@ const add = async (req, res) => {
     status: planStatus,
   });
 
-  const newPlan = await Plan.findOne({ owner }).populate(
+  const newPlan = await Plan.findById(plan._id).populate(
     "books stats",
     "-createdAt -updatedAt -owner"
   );

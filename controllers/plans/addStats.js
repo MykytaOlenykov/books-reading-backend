@@ -46,7 +46,9 @@ const add = async (req, res) => {
     .diff(currentDateObj, "days")
     .toObject().days;
 
-  const isTimeover = endDateObj.diff(startDateObj, "days").toObject().days <= 0;
+  const isTimeover =
+    endDateObj.setZone(timezone).diff(currentDateObj, "days").toObject().days <=
+    0;
 
   if (isTimeover) {
     await Plan.findByIdAndUpdate(plan._id, { status: "timeover" });
@@ -88,11 +90,11 @@ const add = async (req, res) => {
       pagesFinished: book.pagesFinished + pagesRead,
     },
     { new: true }
-  );
+  ).select("-createdAt -updatedAt -owner");
 
   const isFinishedBook = updatedBook.pagesTotal === updatedBook.pagesFinished;
 
-  const { books } = await Plan.findOne({ owner }).populate(
+  const { books } = await Plan.findById(plan._id).populate(
     "books",
     "-createdAt -updatedAt -owner"
   );
@@ -107,15 +109,6 @@ const add = async (req, res) => {
     await Plan.findByIdAndUpdate(plan._id, { status: "finished" });
   }
 
-  const bookObj = {
-    _id: updatedBook._id,
-    title: updatedBook.title,
-    author: updatedBook.author,
-    publishYear: updatedBook.publishYear,
-    pagesTotal: updatedBook.pagesTotal,
-    pagesFinished: updatedBook.pagesFinished,
-  };
-
   const { status } = await Plan.findById(plan._id);
 
   if (plan.stats.length) {
@@ -127,17 +120,12 @@ const add = async (req, res) => {
         },
       },
       { new: true }
-    );
+    ).select("-createdAt -updatedAt -owner");
 
     if (stats) {
       return res.json({
-        stats: {
-          _id: stats._id,
-          date: stats.date,
-          pagesPerDay: stats.pagesPerDay,
-          currentDateStats: stats.currentDateStats,
-        },
-        book: bookObj,
+        stats,
+        book: updatedBook,
         planStatus: status,
       });
     }
@@ -163,7 +151,7 @@ const add = async (req, res) => {
         pagesPerDay: newStats.pagesPerDay,
         currentDateStats: newStats.currentDateStats,
       },
-      book: bookObj,
+      book: updatedBook,
       planStatus: status,
     });
   }
@@ -189,7 +177,7 @@ const add = async (req, res) => {
       pagesPerDay: newStats.pagesPerDay,
       currentDateStats: newStats.currentDateStats,
     },
-    book: bookObj,
+    book: updatedBook,
     planStatus: status,
   });
 };

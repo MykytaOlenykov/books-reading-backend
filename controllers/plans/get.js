@@ -18,14 +18,18 @@ const get = async (req, res) => {
     throw HttpError(404);
   }
 
+  const planResObj = {
+    _id: plan._id,
+    startDate: plan.startDate,
+    endDate: plan.endDate,
+    books: plan.books,
+    stats: plan.stats,
+    status: plan.status,
+  };
+
   if (plan.status === "finished" || plan.status === "timeover") {
     return res.json({
-      _id: plan._id,
-      startDate: plan.startDate,
-      endDate: plan.endDate,
-      books: plan.books,
-      stats: plan.stats,
-      status: plan.status,
+      ...planResObj,
       pagesPerDay: 0,
     });
   }
@@ -67,12 +71,7 @@ const get = async (req, res) => {
   const pagesPerDay = Math.ceil(totalPages / duration);
 
   res.json({
-    _id: plan._id,
-    startDate: plan.startDate,
-    endDate: plan.endDate,
-    books: plan.books,
-    stats: plan.stats,
-    status: plan.status,
+    ...planResObj,
     pagesPerDay,
   });
 };
