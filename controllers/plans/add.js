@@ -18,15 +18,11 @@ const add = async (req, res) => {
     throw HttpError(409, "This user has a plan created.");
   }
 
-  const offset = new Date().getTimezoneOffset() / 60;
-
-  const localDate = addHours(new Date(), -offset);
-
   const serverTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const serverDateUtc = utcToZonedTime(new Date(), serverTimezone);
+  const serverZonedDate = utcToZonedTime(new Date(), serverTimezone);
 
-  const currentDateUtc = utcToZonedTime(serverDateUtc, timezone);
+  const currentDateUtc = zonedTimeToUtc(serverZonedDate, timezone);
 
   const differenceWithCurrentDate = differenceInDays(
     new Date(startDate),
@@ -35,7 +31,6 @@ const add = async (req, res) => {
 
   const difference = differenceInDays(new Date(endDate), new Date(startDate));
 
-  console.log("serverTimezone", serverTimezone);
   console.log("currentDateUtc", currentDateUtc);
   console.log("startDate", new Date(startDate));
   console.log("endDate", new Date(endDate));
