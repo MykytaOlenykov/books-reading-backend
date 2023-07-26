@@ -31,7 +31,7 @@ const add = async (req, res) => {
 
   const difference = differenceInDays(new Date(endDate), new Date(startDate));
 
-  console.log("currentDateUtc", currentDateUtc);
+  console.log("currentDateUtc", localDate);
   console.log("startDate", new Date(startDate));
   console.log("endDate", new Date(endDate));
 
@@ -44,37 +44,6 @@ const add = async (req, res) => {
   if (differenceWithCurrentDate < 0 || difference < 1) {
     throw HttpError(400, "Invalid dates");
   }
-
-  // const currentDateObj = DateTime.local().setZone(timezone).set({
-  //   hour: 0,
-  //   minute: 0,
-  //   second: 0,
-  //   millisecond: 0,
-  // });
-
-  // const startDateObj = createDateObj(startDate);
-
-  // const endDateObj = createDateObj(endDate);
-
-  // const durationWithCurrentDate = startDateObj
-  //   .setZone(timezone)
-  //   .diff(currentDateObj, "days")
-  //   .toObject().days;
-
-  // console.log("durationWithCurrentDate", durationWithCurrentDate);
-
-  // const duration = endDateObj.diff(startDateObj, "days").toObject().days;
-
-  // const planStatus = durationWithCurrentDate <= 0 ? "active" : "idle";
-
-  // if (
-  //   durationWithCurrentDate === undefined ||
-  //   durationWithCurrentDate < 0 ||
-  //   !duration ||
-  //   duration < 1
-  // ) {
-  //   throw HttpError(400, "Invalid dates");
-  // }
 
   const books = await Book.find({ _id: { $in: [...booksIds] }, owner });
 
