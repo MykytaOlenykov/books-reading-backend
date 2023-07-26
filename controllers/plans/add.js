@@ -26,7 +26,7 @@ const add = async (req, res) => {
 
   const differenceWithCurrentDate = differenceInDays(
     new Date(startDate),
-    currentDateUtc
+    localDate
   );
 
   const difference = differenceInDays(new Date(endDate), new Date(startDate));
