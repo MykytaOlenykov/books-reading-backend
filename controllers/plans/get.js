@@ -1,6 +1,7 @@
-const { DateTime } = require("luxon");
+const { differenceInCalendarDays } = require("date-fns");
+const { utcToZonedTime } = require("date-fns-tz");
 
-const { HttpError, createDateObj, validateTimezone } = require("../../helpers");
+const { HttpError, validateTimezone } = require("../../helpers");
 const { Plan } = require("../../models/plan");
 
 const get = async (req, res) => {
@@ -34,18 +35,14 @@ const get = async (req, res) => {
     });
   }
 
-  const currentDateObj = DateTime.local().setZone(timezone).set({
-    hour: 0,
-    minute: 0,
-    second: 0,
-    millisecond: 0,
-  });
+  const currentDate = utcToZonedTime(new Date(), timezone);
 
-  const endDateObj = createDateObj(plan.endDate).setZone(timezone);
+  const difference = differenceInCalendarDays(
+    new Date(plan.endDate),
+    currentDate
+  );
 
-  const duration = endDateObj.diff(currentDateObj, "days").toObject().days;
-
-  if (!duration || duration <= 0) {
+  if (difference <= 0) {
     const result = await Plan.findByIdAndUpdate(
       plan._id,
       { status: "timeover" },
@@ -68,7 +65,7 @@ const get = async (req, res) => {
     0
   );
 
-  const pagesPerDay = Math.ceil(totalPages / duration);
+  const pagesPerDay = Math.ceil(totalPages / difference);
 
   res.json({
     ...planResObj,

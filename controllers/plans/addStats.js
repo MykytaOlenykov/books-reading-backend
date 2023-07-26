@@ -1,6 +1,7 @@
-const { DateTime } = require("luxon");
+const { differenceInCalendarDays } = require("date-fns");
+const { utcToZonedTime } = require("date-fns-tz");
 
-const { HttpError, createDateObj, validateTimezone } = require("../../helpers");
+const { HttpError, validateTimezone } = require("../../helpers");
 const { Book } = require("../../models/book");
 const { Plan } = require("../../models/plan");
 const { Stat } = require("../../models/stat");
@@ -21,34 +22,24 @@ const add = async (req, res) => {
     throw HttpError(404);
   }
 
-  if (plan.status === "finished" || plan.status === "timeover") {
-    throw HttpError(400, "plan is finished");
+  if (plan.status !== "active") {
+    throw HttpError(400, "plan is not active");
   }
 
-  const startDateObj = createDateObj(plan.startDate);
+  const currentDate = utcToZonedTime(new Date(), timezone);
 
-  const endDateObj = createDateObj(plan.endDate);
+  const differenceWithStartDate = differenceInCalendarDays(
+    new Date(date),
+    new Date(plan.startDate)
+  );
 
-  const dateObj = createDateObj(date);
-
-  const currentDateObj = DateTime.local()
-    .setZone(timezone)
-    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-
-  const durationWithStartDate = dateObj
-    .diff(startDateObj, "days")
-    .toObject().days;
-
-  const durationWithEndDate = endDateObj.diff(dateObj, "days").toObject().days;
-
-  const durationWithCurrentDate = dateObj
-    .setZone(timezone)
-    .diff(currentDateObj, "days")
-    .toObject().days;
+  const differenceWithEndDate = differenceInCalendarDays(
+    new Date(plan.endDate),
+    new Date(date)
+  );
 
   const isTimeover =
-    endDateObj.setZone(timezone).diff(currentDateObj, "days").toObject().days <=
-    0;
+    differenceInCalendarDays(new Date(plan.endDate), currentDate) <= 0;
 
   if (isTimeover) {
     await Plan.findByIdAndUpdate(plan._id, { status: "timeover" });
@@ -56,14 +47,7 @@ const add = async (req, res) => {
     throw HttpError(409, "timeover");
   }
 
-  if (
-    durationWithStartDate === undefined ||
-    durationWithStartDate < 0 ||
-    !durationWithEndDate ||
-    durationWithEndDate < 1 ||
-    durationWithCurrentDate === undefined ||
-    durationWithCurrentDate < 0
-  ) {
+  if (differenceWithStartDate < 0 || differenceWithEndDate < 1) {
     throw HttpError(400, "Invalid dates");
   }
 
@@ -82,7 +66,7 @@ const add = async (req, res) => {
     0
   );
 
-  const pagesPerDay = Math.ceil(totalPages / durationWithEndDate);
+  const pagesPerDay = Math.ceil(totalPages / differenceWithEndDate);
 
   const updatedBook = await Book.findByIdAndUpdate(
     book._id,

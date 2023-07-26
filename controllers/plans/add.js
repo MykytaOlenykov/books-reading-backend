@@ -1,5 +1,5 @@
-const { differenceInDays, addHours } = require("date-fns");
-const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
+const { differenceInCalendarDays } = require("date-fns");
+const { utcToZonedTime } = require("date-fns-tz");
 
 const { HttpError, validateTimezone } = require("../../helpers");
 const { Book } = require("../../models/book");
@@ -20,20 +20,15 @@ const add = async (req, res) => {
 
   const currentDate = utcToZonedTime(new Date(), timezone);
 
-  const differenceWithCurrentDate = differenceInDays(
+  const differenceWithCurrentDate = differenceInCalendarDays(
     new Date(startDate),
     currentDate
   );
 
-  const difference = differenceInDays(new Date(endDate), new Date(startDate));
-
-  console.log("currentDate", currentDate);
-  console.log("startDate", new Date(startDate));
-  console.log("endDate", new Date(endDate));
-
-  console.log("differenceWithCurrentDate", differenceWithCurrentDate);
-
-  console.log("difference", difference);
+  const difference = differenceInCalendarDays(
+    new Date(endDate),
+    new Date(startDate)
+  );
 
   const planStatus = differenceWithCurrentDate <= 0 ? "active" : "idle";
 
