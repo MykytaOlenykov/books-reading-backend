@@ -40,9 +40,6 @@ const add = async (req, res) => {
 
   const difference = differenceInCalendarDays(currentDate, new Date(date));
 
-  console.log(currentDate);
-  console.log(new Date(date));
-
   const isTimeover =
     differenceInCalendarDays(new Date(plan.endDate), currentDate) <= 0;
 
