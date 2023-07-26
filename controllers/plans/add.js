@@ -21,12 +21,7 @@ const add = async (req, res) => {
     .setZone(timezone)
     .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 
-  const startDateObj = createDateObj(startDate).set({
-    hour: 0,
-    minute: 0,
-    second: 0,
-    millisecond: 0,
-  });
+  const startDateObj = createDateObj(startDate);
 
   const endDateObj = createDateObj(endDate);
 
@@ -36,6 +31,10 @@ const add = async (req, res) => {
     .toObject().days;
 
   console.log("durationWithCurrentDate", durationWithCurrentDate);
+
+  console.log("currentDateObj\n", currentDateObj);
+
+  console.log("startDateObj\n", startDateObj);
 
   const duration = endDateObj.diff(startDateObj, "days").toObject().days;
 
