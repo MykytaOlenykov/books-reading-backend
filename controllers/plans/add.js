@@ -1,3 +1,6 @@
+const { differenceInDays } = require("date-fns");
+const { zonedTimeToUtc } = require("date-fns-tz");
+
 const {
   HttpError,
   validateTimezone,
@@ -19,10 +22,21 @@ const add = async (req, res) => {
     throw HttpError(409, "This user has a plan created.");
   }
 
-  const differenceWithCurrentDate = calcDifferenceInDays(
-    new Date(),
-    new Date(`${startDate}T00:00:00`),
-    timezone
+  // const differenceWithCurrentDate = calcDifferenceInDays(
+  //   new Date(),
+  //   new Date(`${startDate}T00:00:00`),
+  //   timezone
+  // );
+
+  const currentDateUtc = zonedTimeToUtc(new Date(), timezone);
+  const startDateUtc = zonedTimeToUtc(`${startDate}T00:00:00`, timezone);
+
+  console.log("currentDateUtc", currentDateUtc);
+  console.log("startDateUtc", startDateUtc);
+
+  const differenceWithCurrentDate = differenceInDays(
+    startDateUtc,
+    currentDateUtc
   );
 
   console.log("differenceWithCurrentDate", differenceWithCurrentDate);
