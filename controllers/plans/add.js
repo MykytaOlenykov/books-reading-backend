@@ -1,5 +1,5 @@
 const { differenceInDays, addHours } = require("date-fns");
-const { zonedTimeToUtc } = require("date-fns-tz");
+const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 
 const { HttpError, validateTimezone } = require("../../helpers");
 const { Book } = require("../../models/book");
@@ -22,16 +22,21 @@ const add = async (req, res) => {
 
   const localDate = addHours(new Date(), -offset);
 
-  const currentDateUtc = zonedTimeToUtc(localDate, timezone);
+  const serverTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const serverDateUtc = utcToZonedTime(localDate, serverTimezone);
+
+  const currentDateUtc = utcToZonedTime(serverDateUtc, timezone);
 
   const differenceWithCurrentDate = differenceInDays(
     new Date(startDate),
-    localDate
+    currentDateUtc
   );
 
   const difference = differenceInDays(new Date(endDate), new Date(startDate));
 
-  console.log("currentDateUtc", localDate);
+  console.log("serverTimezone", serverTimezone);
+  console.log("currentDateUtc", currentDateUtc);
   console.log("startDate", new Date(startDate));
   console.log("endDate", new Date(endDate));
 
