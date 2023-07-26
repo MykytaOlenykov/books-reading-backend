@@ -1,7 +1,8 @@
+const { DateTime } = require("luxon");
 const { differenceInDays } = require("date-fns");
 const { zonedTimeToUtc } = require("date-fns-tz");
 
-const { HttpError, validateTimezone } = require("../../helpers");
+const { HttpError, validateTimezone, createDateObj } = require("../../helpers");
 const { Book } = require("../../models/book");
 const { Plan } = require("../../models/plan");
 
@@ -18,62 +19,61 @@ const add = async (req, res) => {
     throw HttpError(409, "This user has a plan created.");
   }
 
-  const currentDateUtc = zonedTimeToUtc(new Date(), timezone);
-  const startDateUtc = zonedTimeToUtc(new Date(startDate), timezone);
-  const endDateUtc = zonedTimeToUtc(new Date(endDate), timezone);
+  // console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-  console.log("currentDateUtc", currentDateUtc);
-  console.log("startDateUtc", startDateUtc);
-  console.log("endDateUtc", endDateUtc);
+  // const currentDateUtc = zonedTimeToUtc(new Date(), timezone);
 
-  const differenceWithCurrentDate = differenceInDays(
-    startDateUtc,
-    currentDateUtc
-  );
+  // console.log(new Date(startDate));
 
-  const difference = differenceInDays(endDateUtc, startDateUtc);
+  // console.log("currentDateUtc", currentDateUtc);
 
-  console.log("differenceWithCurrentDate", differenceWithCurrentDate);
+  // const differenceWithCurrentDate = differenceInDays(
+  //   new Date(startDate),
+  //   currentDateUtc
+  // );
 
-  console.log("difference", difference);
+  // const difference = differenceInDays(new Date(endDate), new Date(startDate));
 
-  const planStatus = differenceWithCurrentDate <= 0 ? "active" : "idle";
+  // console.log("differenceWithCurrentDate", differenceWithCurrentDate);
 
-  if (differenceWithCurrentDate < 0 || difference < 1) {
-    throw HttpError(400, "Invalid dates");
-  }
+  // console.log("difference", difference);
 
-  // const currentDateObj = DateTime.local()
-  //   .setZone(timezone)
-  //   .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+  // const planStatus = differenceWithCurrentDate <= 0 ? "active" : "idle";
 
-  // const startDateObj = createDateObj(startDate);
-
-  // const endDateObj = createDateObj(endDate);
-
-  // const durationWithCurrentDate = startDateObj
-  //   .setZone(timezone)
-  //   .diff(currentDateObj, "days")
-  //   .toObject().days;
-
-  // console.log("durationWithCurrentDate", durationWithCurrentDate);
-
-  // console.log("currentDateObj\n", currentDateObj);
-
-  // console.log("startDateObj\n", startDateObj.setZone(timezone));
-
-  // const duration = endDateObj.diff(startDateObj, "days").toObject().days;
-
-  // const planStatus = durationWithCurrentDate <= 0 ? "active" : "idle";
-
-  // if (
-  //   durationWithCurrentDate === undefined ||
-  //   durationWithCurrentDate < 0 ||
-  //   !duration ||
-  //   duration < 1
-  // ) {
+  // if (differenceWithCurrentDate < 0 || difference < 1) {
   //   throw HttpError(400, "Invalid dates");
   // }
+
+  const currentDateObj = DateTime.local().setZone(timezone).set({
+    hour: 0,
+    minute: 0,
+    second: 0,
+    millisecond: 0,
+  });
+
+  const startDateObj = createDateObj(startDate);
+
+  const endDateObj = createDateObj(endDate);
+
+  const durationWithCurrentDate = startDateObj
+    .setZone(timezone)
+    .diff(currentDateObj, "days")
+    .toObject().days;
+
+  console.log("durationWithCurrentDate", durationWithCurrentDate);
+
+  const duration = endDateObj.diff(startDateObj, "days").toObject().days;
+
+  const planStatus = durationWithCurrentDate <= 0 ? "active" : "idle";
+
+  if (
+    durationWithCurrentDate === undefined ||
+    durationWithCurrentDate < 0 ||
+    !duration ||
+    duration < 1
+  ) {
+    throw HttpError(400, "Invalid dates");
+  }
 
   const books = await Book.find({ _id: { $in: [...booksIds] }, owner });
 
@@ -92,7 +92,7 @@ const add = async (req, res) => {
     return acc + book.pagesTotal - book.pagesFinished;
   }, 0);
 
-  const pagesPerDay = Math.ceil(totalPages / difference);
+  const pagesPerDay = Math.ceil(totalPages / duration);
 
   await Plan.create({
     startDate,
