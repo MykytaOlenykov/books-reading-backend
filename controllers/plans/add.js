@@ -30,6 +30,8 @@ const add = async (req, res) => {
     .diff(currentDateObj, "days")
     .toObject().days;
 
+  console.log("durationWithCurrentDate", durationWithCurrentDate);
+
   const duration = endDateObj.diff(startDateObj, "days").toObject().days;
 
   const planStatus = durationWithCurrentDate <= 0 ? "active" : "idle";
