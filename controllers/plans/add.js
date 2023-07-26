@@ -70,7 +70,7 @@ const add = async (req, res) => {
     status: planStatus,
   });
 
-  const newPlan = await Plan.findById(plan._id).populate(
+  const newPlan = await Plan.findOne({ owner }).populate(
     "books stats",
     "-createdAt -updatedAt -owner"
   );
