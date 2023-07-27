@@ -8,14 +8,16 @@ const router = Router();
 
 router.get("/", authenticate, ctrl.getAll);
 
-router.post("/", authenticate, validateBody(schemas.addSchema), ctrl.add);
+router.post("/", authenticate, validateBody(schemas.addBookSchema), ctrl.add);
 
 router.delete("/:bookId", authenticate, isValidId, ctrl.deleteById);
 
-// router.patch("/review/:bookId", (_, res) => {
-//   res.status(500).json({
-//     message: "This route has not yet been implemented",
-//   });
-// });
+router.patch(
+  "/:bookId/review",
+  authenticate,
+  isValidId,
+  validateBody(schemas.addBookReviewSchema),
+  ctrl.addReview
+);
 
 module.exports = router;

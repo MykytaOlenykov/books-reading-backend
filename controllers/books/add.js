@@ -20,6 +20,8 @@ const add = async (req, res) => {
     publishYear: result.publishYear,
     pagesTotal: result.pagesTotal,
     pagesFinished: result.pagesFinished,
+    rating: result.rating,
+    feedback: result.feedback,
   });
 };
 

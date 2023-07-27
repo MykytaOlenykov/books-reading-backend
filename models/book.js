@@ -62,6 +62,17 @@ const bookSchema = new Schema(
       min: 0,
       default: 0,
     },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: null,
+    },
+    feedback: {
+      type: String,
+      maxlength: 3000,
+      default: null,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -77,7 +88,7 @@ bookSchema.post("save", handleMongooseError);
 
 const Book = model("book", bookSchema);
 
-const addSchema = Joi.object({
+const addBookSchema = Joi.object({
   title: Joi.string().min(2).max(255).required(),
   author: Joi.string().min(2).max(255).required(),
   publishYear: Joi.number()
@@ -99,8 +110,14 @@ const addSchema = Joi.object({
     .required(),
 });
 
+const addBookReviewSchema = Joi.object({
+  rating: Joi.number().min(1).max(5).required(),
+  feedback: Joi.string().max(3000).allow(""),
+});
+
 const schemas = {
-  addSchema,
+  addBookSchema,
+  addBookReviewSchema,
 };
 
 module.exports = {
