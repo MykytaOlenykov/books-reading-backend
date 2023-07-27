@@ -60,8 +60,6 @@ statSchema.post("save", handleMongooseError);
 const Stat = model("stat", statSchema);
 
 const addStatsSchema = Joi.object({
-  date: Joi.string().pattern(regexps.date).required(),
-  time: Joi.string().pattern(regexps.time).required(),
   pagesRead: Joi.number().required(),
   book: Joi.string()
     .custom((value, helpers) => {

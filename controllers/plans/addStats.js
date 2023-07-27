@@ -1,5 +1,5 @@
 const { differenceInCalendarDays } = require("date-fns");
-const { utcToZonedTime } = require("date-fns-tz");
+const { utcToZonedTime, format } = require("date-fns-tz");
 
 const { HttpError, validateTimezone } = require("../../helpers");
 const { Book } = require("../../models/book");
@@ -7,7 +7,7 @@ const { Plan } = require("../../models/plan");
 const { Stat } = require("../../models/stat");
 
 const add = async (req, res) => {
-  const { date, pagesRead, time, book: bookId } = req.body;
+  const { pagesRead, book: bookId } = req.body;
   const { _id: owner } = req.user;
   const { timezone } = req.query;
 
@@ -28,33 +28,18 @@ const add = async (req, res) => {
 
   const currentDate = utcToZonedTime(new Date(), timezone);
 
-  const differenceWithStartDate = differenceInCalendarDays(
-    new Date(date),
-    new Date(plan.startDate)
-  );
+  const date = format(currentDate, "yyyy-MM-dd");
+  const time = format(currentDate, "HH-mm-ss");
 
   const differenceWithEndDate = differenceInCalendarDays(
     new Date(plan.endDate),
-    new Date(date)
+    currentDate
   );
 
-  const difference = differenceInCalendarDays(currentDate, new Date(date));
-
-  const isTimeover =
-    differenceInCalendarDays(new Date(plan.endDate), currentDate) <= 0;
-
-  if (isTimeover) {
+  if (differenceWithEndDate <= 0) {
     await Plan.findByIdAndUpdate(plan._id, { status: "timeover" });
 
     throw HttpError(409, "timeover");
-  }
-
-  if (
-    differenceWithStartDate < 0 ||
-    differenceWithEndDate < 1 ||
-    difference !== 0
-  ) {
-    throw HttpError(400, "Invalid dates");
   }
 
   const book = await Book.findOne({ _id: bookId, owner });
