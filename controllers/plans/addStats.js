@@ -39,7 +39,7 @@ const add = async (req, res) => {
   if (differenceWithEndDate <= 0) {
     await Plan.findByIdAndUpdate(plan._id, { status: "timeover" });
 
-    throw HttpError(409, "timeover");
+    throw HttpError(400, "timeover");
   }
 
   const book = await Book.findOne({ _id: bookId, owner });
@@ -115,6 +115,7 @@ const add = async (req, res) => {
       book: bookId,
       isFinishedBook,
     },
+    plan: plan._id,
     owner,
   });
 
