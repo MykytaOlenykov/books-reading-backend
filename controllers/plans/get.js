@@ -11,7 +11,7 @@ const get = async (req, res) => {
   validateTimezone(timezone);
 
   const plan = await Plan.findOne({ owner }).populate(
-    "books stats",
+    "books statistics",
     "-createdAt -updatedAt -owner"
   );
 
@@ -24,7 +24,7 @@ const get = async (req, res) => {
     startDate: plan.startDate,
     endDate: plan.endDate,
     books: plan.books,
-    stats: plan.stats,
+    statistics: plan.statistics,
     status: plan.status,
   };
 
@@ -47,14 +47,14 @@ const get = async (req, res) => {
       plan._id,
       { status: "timeover" },
       { new: true }
-    ).populate("books stats", "-createdAt -updatedAt -owner");
+    ).populate("books statistics", "-createdAt -updatedAt -owner");
 
     return res.json({
       _id: result._id,
       startDate: result.startDate,
       endDate: result.endDate,
       books: result.books,
-      stats: result.stats,
+      statistics: result.statistics,
       status: result.status,
       pagesPerDay: 0,
     });

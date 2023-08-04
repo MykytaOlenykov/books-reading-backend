@@ -3,7 +3,7 @@ const { Router } = require("express");
 const { authenticate, validateBody } = require("../../middlewares");
 const { schemas } = require("../../models/plan");
 const ctrl = require("../../controllers/plans");
-const { schemas: statsSchema } = require("../../models/stat");
+const { schemas: statisticSchemas } = require("../../models/statistic");
 
 const router = Router();
 
@@ -21,10 +21,10 @@ router.patch(
 router.delete("/", authenticate, ctrl.finish);
 
 router.patch(
-  "/stats",
+  "/statistics",
   authenticate,
-  validateBody(statsSchema.addStatsSchema),
-  ctrl.addStats
+  validateBody(statisticSchemas.addStatisticsSchema),
+  ctrl.addStatistics
 );
 
 module.exports = router;

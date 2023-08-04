@@ -25,7 +25,7 @@ const currentDateStatsSchema = new Schema({
   },
 });
 
-const statSchema = new Schema(
+const statisticSchema = new Schema(
   {
     date: {
       type: String,
@@ -60,18 +60,18 @@ const statSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
-statSchema.index(
+statisticSchema.index(
   { date: 1, owner: 1, plan: 1 },
   {
     unique: true,
   }
 );
 
-statSchema.post("save", handleMongooseError);
+statisticSchema.post("save", handleMongooseError);
 
-const Stat = model("stat", statSchema);
+const Statistic = model("statistic", statisticSchema);
 
-const addStatsSchema = Joi.object({
+const addStatisticsSchema = Joi.object({
   pagesRead: Joi.number().required(),
   book: Joi.string()
     .custom((value, helpers) => {
@@ -84,10 +84,10 @@ const addStatsSchema = Joi.object({
 });
 
 const schemas = {
-  addStatsSchema,
+  addStatisticsSchema,
 };
 
 module.exports = {
-  Stat,
+  Statistic,
   schemas,
 };

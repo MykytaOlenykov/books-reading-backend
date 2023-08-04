@@ -41,9 +41,9 @@ const planSchema = new Schema(
       ],
       required: true,
     },
-    stats: {
+    statistics: {
       type: [Schema.Types.ObjectId],
-      ref: "stat",
+      ref: "statistic",
       default: [],
     },
     status: {

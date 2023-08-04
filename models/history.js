@@ -25,9 +25,9 @@ const historySchema = new Schema(
       enum: ["cancel", "finished", "timeover"],
       required: true,
     },
-    stats: {
+    statistics: {
       type: [Schema.Types.ObjectId],
-      ref: "stat",
+      ref: "statistic",
       default: [],
     },
     owner: {

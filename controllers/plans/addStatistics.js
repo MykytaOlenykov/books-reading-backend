@@ -4,7 +4,7 @@ const { utcToZonedTime, format } = require("date-fns-tz");
 const { HttpError, validateTimezone } = require("../../helpers");
 const { Book } = require("../../models/book");
 const { Plan } = require("../../models/plan");
-const { Stat } = require("../../models/stat");
+const { Statistic } = require("../../models/statistic");
 
 const add = async (req, res) => {
   const { pagesRead, book: bookId } = req.body;
@@ -86,9 +86,9 @@ const add = async (req, res) => {
 
   const { status } = await Plan.findById(plan._id);
 
-  if (plan.stats.length) {
-    const stats = await Stat.findOneAndUpdate(
-      { owner, date, _id: { $in: [...plan.stats] } },
+  if (plan.statistics.length) {
+    const statistics = await Statistic.findOneAndUpdate(
+      { owner, date, _id: { $in: [...plan.statistics] } },
       {
         $push: {
           currentDateStats: { pagesRead, time, book: bookId, isFinishedBook },
@@ -97,16 +97,16 @@ const add = async (req, res) => {
       { new: true }
     ).select("-createdAt -updatedAt -owner");
 
-    if (stats) {
+    if (statistics) {
       return res.json({
-        stats,
+        statistics,
         book: updatedBook,
         planStatus: status,
       });
     }
   }
 
-  const newStats = await Stat.create({
+  const newStatistic = await Statistic.create({
     date,
     pagesPerDay,
     currentDateStats: {
@@ -119,14 +119,16 @@ const add = async (req, res) => {
     owner,
   });
 
-  await Plan.findByIdAndUpdate(plan._id, { $push: { stats: newStats._id } });
+  await Plan.findByIdAndUpdate(plan._id, {
+    $push: { statistics: newStatistic._id },
+  });
 
   res.json({
-    stats: {
-      _id: newStats._id,
-      date: newStats.date,
-      pagesPerDay: newStats.pagesPerDay,
-      currentDateStats: newStats.currentDateStats,
+    statistics: {
+      _id: newStatistic._id,
+      date: newStatistic.date,
+      pagesPerDay: newStatistic.pagesPerDay,
+      currentDateStats: newStatistic.currentDateStats,
     },
     book: updatedBook,
     planStatus: status,

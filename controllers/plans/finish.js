@@ -34,7 +34,7 @@ const finish = async (req, res) => {
     endDate: plan.endDate,
     completionDate,
     status,
-    stats: plan.stats,
+    statistics: plan.statistics,
     owner,
   });
 
