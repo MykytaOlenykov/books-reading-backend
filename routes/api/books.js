@@ -10,10 +10,10 @@ router.get("/", authenticate, ctrl.getAll);
 
 router.post("/", authenticate, validateBody(schemas.addBookSchema), ctrl.add);
 
-router.delete("/:bookId", authenticate, isValidId, ctrl.deleteById);
+router.delete("/:id", authenticate, isValidId, ctrl.deleteById);
 
 router.patch(
-  "/:bookId/review",
+  "/:id/review",
   authenticate,
   isValidId,
   validateBody(schemas.addBookReviewSchema),

@@ -4,15 +4,15 @@ const { HttpError } = require("../../helpers");
 
 const deleteById = async (req, res) => {
   const { _id: owner } = req.user;
-  const { bookId } = req.params;
+  const { id } = req.params;
 
-  const plan = await Plan.findOne({ owner, books: { $in: [bookId] } });
+  const plan = await Plan.findOne({ owner, books: { $in: [id] } });
 
   if (plan) {
     throw HttpError(400, "This book is included in the plan");
   }
 
-  const result = await Book.findOneAndRemove({ _id: bookId, owner });
+  const result = await Book.findOneAndRemove({ _id: id, owner });
 
   if (!result) {
     throw HttpError(404);

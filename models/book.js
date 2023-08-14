@@ -111,7 +111,7 @@ const addBookSchema = Joi.object({
 });
 
 const addBookReviewSchema = Joi.object({
-  rating: Joi.number().min(1).max(5).required(),
+  rating: Joi.number().integer().min(1).max(5).required(),
   feedback: Joi.string().max(3000).allow(""),
 });
 

@@ -3,13 +3,9 @@ const { HttpError } = require("../../helpers");
 
 const addReview = async (req, res) => {
   const { _id: owner } = req.user;
-  const { bookId: _id } = req.params;
+  const { id: _id } = req.params;
 
-  const book = await Book.findOneAndUpdate(
-    { _id, owner },
-    { ...req.body },
-    { new: true }
-  ).select("-createdAt -updatedAt -owner");
+  const book = await Book.findOne({ _id, owner });
 
   if (!book) {
     throw HttpError(404);
@@ -19,7 +15,11 @@ const addReview = async (req, res) => {
     throw HttpError(400, "this book is not finished");
   }
 
-  res.json(book);
+  const updatedBook = await Book.findOneAndUpdate({ _id, owner }, req.body, {
+    new: true,
+  }).select("-createdAt -updatedAt -owner");
+
+  res.json(updatedBook);
 };
 
 module.exports = addReview;
