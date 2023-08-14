@@ -16,7 +16,7 @@ router.patch(
   "/:id/review",
   authenticate,
   isValidId,
-  validateBody(schemas.addBookReviewSchema),
+  // validateBody(schemas.addBookReviewSchema),
   ctrl.addReview
 );
 

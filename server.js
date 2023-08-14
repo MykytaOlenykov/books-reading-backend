@@ -9,4 +9,7 @@ mongoose
   .then(() => {
     app.listen(PORT);
   })
-  .catch((error) => console.log(error.message));
+  .catch((error) => {
+    console.log(error.message);
+    process.exit(1);
+  });
